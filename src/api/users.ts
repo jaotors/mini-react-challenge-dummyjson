@@ -1,6 +1,6 @@
 const BASE_URL = 'https://dummyjson.com'
 
-type User = {
+export type User = {
   id: number
   firstName: string
   lastName: string
@@ -30,9 +30,11 @@ export const fetchUsers = async ({
   queryKey: [string, { limit: number; skip: number }]
 }): Promise<{ limit: number; skip: number; users: User[]; total: number }> => {
   const [_key, { limit, skip }] = queryKey
-  return fetch(`${BASE_URL}/users?limit=${limit}&skip=${skip}`).then((res) =>
-    res.json()
-  )
+  return fetch(`${BASE_URL}/users?limit=${limit}&skip=${skip}`)
+    .then((res) => res.json())
+    .catch((err) => {
+      throw new Error(err.message || `Error status ${err.status}`)
+    })
 }
 
 export const searchUsers = async ({
@@ -43,7 +45,11 @@ export const searchUsers = async ({
   const [_key, { limit, skip, query }] = queryKey
   return fetch(
     `${BASE_URL}/users/search?q=${query}&limit=${limit}&skip=${skip}`
-  ).then((res) => res.json())
+  )
+    .then((res) => res.json())
+    .catch((err) => {
+      throw new Error(err.message || `Error status ${err.status}`)
+    })
 }
 
 export const fetchUserById = async ({
@@ -52,5 +58,9 @@ export const fetchUserById = async ({
   queryKey: [string, number]
 }): Promise<User> => {
   const [_key, id] = queryKey
-  return fetch(`${BASE_URL}/users/${id}`).then((res) => res.json())
+  return fetch(`${BASE_URL}/users/${id}`)
+    .then((res) => res.json())
+    .catch((err) => {
+      throw new Error(err.message || `Error status ${err.status}`)
+    })
 }

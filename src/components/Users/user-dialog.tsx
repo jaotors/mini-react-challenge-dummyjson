@@ -1,5 +1,6 @@
 import Dialog from '../Dialog'
 import { useUserQuery } from '../../queries/useUsersQuery'
+import Loader from '../Loader'
 
 const UserDialog = ({
   id,
@@ -10,7 +11,15 @@ const UserDialog = ({
   open: boolean
   closeDialog: () => void
 }) => {
-  const { data } = useUserQuery(id)
+  const { data, isLoading } = useUserQuery(id)
+
+  if (isLoading) {
+    return (
+      <Dialog open={open} closeDialog={closeDialog}>
+        <Loader />
+      </Dialog>
+    )
+  }
 
   return (
     <Dialog open={open} closeDialog={closeDialog}>

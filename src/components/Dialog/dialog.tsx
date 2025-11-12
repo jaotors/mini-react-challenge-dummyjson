@@ -29,7 +29,12 @@ const Dialog = ({
     >
       <div className='w-100 p-4'>
         <div className='flex justify-end'>
-          <button className='flex items-center justify-center w-10 h-10'>X</button>
+          <button
+            className='flex items-center justify-center w-10 h-10 border rounded-md cursor-pointer hover:bg-gray-200'
+            onClick={closeDialog}
+          >
+            X
+          </button>
         </div>
         {children}
       </div>
