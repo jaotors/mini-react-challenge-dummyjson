@@ -1,11 +1,14 @@
 import React, { useMemo, useState } from 'react'
 import { useDebounceValue } from 'usehooks-ts'
-import { useUsersQuery } from '../../queries/useUsersQuery'
-import { useUsersSearchQuery } from '../../queries/useUsersSearchQuery'
+import { useUsersQuery, useUsersSearchQuery } from '../../queries/useUsersQuery'
+import Dialog from '../Dialog'
+import UserDialog from './user-dialog'
 
 const Users = () => {
   const [skip, setSkip] = useState(0)
   const [genderValue, setGenderValue] = useState(0)
+  const [openDialog, setOpenDialog] = useState(false)
+  const [selectedUserId, setSelectedUserId] = useState<number>(-1)
   const [debounceQueryValue, setDebounceQueryValue] = useDebounceValue('', 500)
 
   const { data: usersData } = useUsersQuery(10, skip)
@@ -45,6 +48,11 @@ const Users = () => {
   ) => {
     const value = e.target.value
     setGenderValue(parseInt(value, 10))
+  }
+
+  const handleSelectUser = (id: number) => {
+    setSelectedUserId(id)
+    setOpenDialog(true)
   }
 
   return (
@@ -87,7 +95,13 @@ const Users = () => {
             </thead>
             <tbody>
               {users.map((user) => (
-                <tr key={user.id}>
+                <tr
+                  key={user.id}
+                  className='cursor-pointer hover:bg-gray-100'
+                  onClick={() => {
+                    handleSelectUser(user.id)
+                  }}
+                >
                   <td className='p-2'>{user.id}</td>
                   <td className='p-2'>{user.username}</td>
                   <td className='p-2'>{user.firstName}</td>
@@ -118,6 +132,11 @@ const Users = () => {
           </div>
         )}
       </div>
+      <UserDialog
+        open={openDialog}
+        closeDialog={() => setOpenDialog(false)}
+        id={selectedUserId}
+      />
     </div>
   )
 }

@@ -45,3 +45,12 @@ export const searchUsers = async ({
     `${BASE_URL}/users/search?q=${query}&limit=${limit}&skip=${skip}`
   ).then((res) => res.json())
 }
+
+export const fetchUserById = async ({
+  queryKey,
+}: {
+  queryKey: [string, number]
+}): Promise<User> => {
+  const [_key, id] = queryKey
+  return fetch(`${BASE_URL}/users/${id}`).then((res) => res.json())
+}
