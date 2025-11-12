@@ -1,21 +1,30 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useDebounceValue } from 'usehooks-ts'
 import { useUsersQuery } from '../../queries/useUsersQuery'
 import { useUsersSearchQuery } from '../../queries/useUsersSearchQuery'
 
 const Users = () => {
   const [skip, setSkip] = useState(0)
+  const [genderValue, setGenderValue] = useState(0)
   const [debounceQueryValue, setDebounceQueryValue] = useDebounceValue('', 500)
 
   const { data: usersData } = useUsersQuery(10, skip)
   const { data: usersSearchData } = useUsersSearchQuery(
     10,
-    skip,
+    debounceQueryValue ? 0 : skip,
     debounceQueryValue
   )
 
   const data = debounceQueryValue ? usersSearchData : usersData
-  const users = data?.users || []
+  const users = useMemo(() => {
+    return (
+      data?.users.filter((user) => {
+        if (genderValue === 0) return true
+        if (genderValue === 1) return user.gender === 'male'
+        if (genderValue === 2) return user.gender === 'female'
+      }) || []
+    )
+  }, [data, genderValue])
 
   const handleNext = () => {
     setSkip((prev) => prev + 10)
@@ -31,6 +40,13 @@ const Users = () => {
     setDebounceQueryValue(value)
   }
 
+  const handleGenderFilterChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const value = e.target.value
+    setGenderValue(parseInt(value, 10))
+  }
+
   return (
     <div className='w-full p-4'>
       <h1 className='text-4xl font-black'>Users Admin</h1>
@@ -41,8 +57,19 @@ const Users = () => {
             className='border p-2 rounded-md'
             type='text'
             onChange={handleSearchChange}
-            placeholder='Search...'
+            placeholder='Search user...'
           />
+        </div>
+        <div className='flex justify-end'>
+          <select
+            onChange={handleGenderFilterChange}
+            value={genderValue}
+            className='border p-2 rounded-md'
+          >
+            <option value={0}>All</option>
+            <option value={1}>Male</option>
+            <option value={2}>Female</option>
+          </select>
         </div>
         <div className='border rounded-md'>
           <table className='w-full'>
